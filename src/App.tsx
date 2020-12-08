@@ -1,11 +1,10 @@
-import React from 'react';
 import './App.less';
-
+console.log(123);
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        123123?
+        3
       </header>
     </div>
   );
