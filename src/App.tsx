@@ -1,5 +1,5 @@
 import './App.less';
-console.log('test precommit');
+console.log('test precommit1');
 function App() {
   return (
     <div className="App">
