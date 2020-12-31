@@ -14,7 +14,7 @@ function User(props: IRouterProps) {
     <div>
       <h1>您所订阅的大佬列表</h1>
       {authors.map((author: any) => (
-        <div>{author.name}</div>
+        <div key={author.id}>{author.name}</div>
       ))}
     </div>
   );
