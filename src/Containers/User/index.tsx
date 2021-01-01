@@ -1,22 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { IRouterProps } from '../types';
-import * as axios from 'axios';
-
-// import './style.less';
+import { useFetchData } from '../../Fetch';
 
 export default function User(props: IRouterProps) {
-  const [authors, setAuthors] = useState([]);
-
-  useEffect(() => {
-    axios.default.get('http://127.0.0.1:8360/folow').then((res) => {
-      setAuthors(res.data);
-    });
-  });
+  const { data, isError } = useFetchData('/follow');
+  if (isError) return <div>isError</div>;
 
   return (
     <div>
       <h1>您所订阅的大佬列表</h1>
-      {authors.map((author: any) => (
+      {(data?.data || []).map((author: any) => (
         <div key={author.id}>{author.name}</div>
       ))}
     </div>
