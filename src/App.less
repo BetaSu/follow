@@ -1,3 +1,14 @@
+// @import '~antd/dist/antd.dark.css'; // 引入官方提供的暗色 less 样式入口文件
+// @import '~antd/dist/antd.compact.css'; // 引入官方提供的紧凑 less 样式入口文件
+@import './variable.less';
+
+body,
+html {
+  min-height: 100%;
+  background-color: @bg;
+  color: @text;
+}
+
 .App {
   text-align: center;
 }

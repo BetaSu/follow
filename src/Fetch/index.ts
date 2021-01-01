@@ -4,7 +4,7 @@ import { PlainObject } from '../Containers/types';
 
 export const fetcher = (url: string) => {
   url = 'http://localhost:3000/api' + url;
-  return axios.get(url).then((res) => res.data);
+  return axios.get(url).then((res) => res.data.data);
 };
 
 function createGetUrl(url: string, params?: PlainObject) {
