@@ -1,17 +1,16 @@
 import './App.less';
 import * as React from 'react';
 import { Router } from '@reach/router';
-import User from './User/index';
+import User from './Containers/User';
+import Flow from './Containers/Flow';
 
-console.log('test precommit12');
-function App() {
+export default function App() {
   return (
     <div className='App'>
       <Router>
         <User path='/user' />
+        <Flow path='/' />
       </Router>
     </div>
   );
 }
-
-export default App;

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { IRouterProps } from '../types';
 import * as axios from 'axios';
 
-function User(props: IRouterProps) {
+// import './style.less';
+
+export default function User(props: IRouterProps) {
   const [authors, setAuthors] = useState([]);
 
   useEffect(() => {
@@ -10,6 +12,7 @@ function User(props: IRouterProps) {
       setAuthors(res.data);
     });
   });
+
   return (
     <div>
       <h1>您所订阅的大佬列表</h1>
@@ -19,5 +22,3 @@ function User(props: IRouterProps) {
     </div>
   );
 }
-
-export default User;
