@@ -12,10 +12,14 @@ interface IAuthorItem {
   unfollow?: boolean;
 }
 
-export default function User(props: IRouterProps) {
-  const { data, isError, mutate } = useFetchData('/follow', undefined, {
-    revalidateOnFocus: false,
-  });
+export default function Recommend(props: IRouterProps) {
+  const { data, isError, mutate } = useFetchData(
+    '/follow/recommend',
+    undefined,
+    {
+      revalidateOnFocus: false,
+    }
+  );
   if (isError) return <div>isError</div>;
 
   const onCancelFollow = async (id: number, type: boolean) => {
@@ -25,10 +29,9 @@ export default function User(props: IRouterProps) {
       }
       return d;
     });
-
     await axios.post('http://localhost:3000/api/follow/follow', {
       author_id: id,
-      type: +type,
+      type: +!type,
     });
 
     mutate(newData, false);
@@ -37,8 +40,9 @@ export default function User(props: IRouterProps) {
   return (
     <AuthorList
       onCancelFollow={onCancelFollow}
-      title='我的关注'
+      title='推荐关注'
       data={data}
+      recommend={true}
     ></AuthorList>
   );
 }

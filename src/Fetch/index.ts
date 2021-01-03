@@ -1,5 +1,5 @@
 import axios from 'axios';
-import useSWR from 'swr';
+import useSWR, { ConfigInterface } from 'swr';
 import { PlainObject } from '../Containers/types';
 
 export const fetcher = (url: string) => {
@@ -23,17 +23,23 @@ function createGetUrl(url: string, params?: PlainObject) {
   return targetUrl;
 }
 
-export function useFetchData(url: string, params?: PlainObject) {
+export function useFetchData(
+  url: string,
+  params?: PlainObject,
+  swrOption?: ConfigInterface
+) {
   if (!url) {
     throw new Error('必须包含url参数！');
   }
 
-  const { data, error } = useSWR(createGetUrl(url, params), fetcher, {
+  const { data, error, mutate } = useSWR(createGetUrl(url, params), fetcher, {
     suspense: true,
+    ...swrOption,
   });
 
   return {
     data,
+    mutate,
     isLoading: !error && !data,
     isError: error,
   };
