@@ -1,7 +1,8 @@
 import React from 'react';
 import axios from 'axios';
 import { IRouterProps } from '../types';
-import { useFetchData } from '../../fetcher';
+import { fetcher } from '../../fetcher';
+import { useSWRInfinite } from 'swr';
 import AuthorList from '../../Components/auhtorList';
 
 interface IAuthorItem {
@@ -12,22 +13,27 @@ interface IAuthorItem {
   unfollow?: boolean;
 }
 
+const getKey = (pageIndex: number, previousPageData: IAuthorItem[] | null) => {
+  if (previousPageData && !previousPageData.length) {
+    return null;
+  }
+  return `/follow/recommend?page=${pageIndex}&limit=3`;
+};
+
 export default function Recommend(props: IRouterProps) {
-  const { data, isError, mutate } = useFetchData(
-    '/follow/recommend',
-    undefined,
-    {
-      revalidateOnFocus: false,
-    }
-  );
-  if (isError) return <div>isError</div>;
+  const { data, size, setSize, mutate } = useSWRInfinite(getKey, fetcher, {
+    revalidateOnFocus: false,
+  });
+  if (!data) return <div>'loading'</div>;
 
   const onCancelFollow = async (id: number, type: boolean) => {
-    const newData = data.map((d: IAuthorItem) => {
-      if (d.id === id) {
-        return { ...d, unfollow: !type };
-      }
-      return d;
+    const newData = data.map((list: IAuthorItem[]) => {
+      return list.map((d) => {
+        if (d.id === id) {
+          return { ...d, unfollow: !type };
+        }
+        return d;
+      });
     });
     await axios.post('http://localhost:3000/api/follow/follow', {
       author_id: id,
@@ -37,13 +43,16 @@ export default function Recommend(props: IRouterProps) {
     mutate(newData, false);
   };
 
+  const allList = data.reduce((pre, cur) => pre.concat(cur), []);
   return (
-
-    <AuthorList
-      onCancelFollow={onCancelFollow}
-      title='推荐关注'
-      data={data}
-      recommend={true}
-    />
+    <React.Fragment>
+      <AuthorList
+        onCancelFollow={onCancelFollow}
+        title='推荐关注'
+        data={allList}
+        recommend={true}
+      />
+      <button onClick={() => setSize(size + 1)}>Load More</button>
+    </React.Fragment>
   );
 }

@@ -1,6 +1,6 @@
 // @import '~antd/dist/antd.dark.css'; // 引入官方提供的暗色 less 样式入口文件
 // @import '~antd/dist/antd.compact.css'; // 引入官方提供的紧凑 less 样式入口文件
-@import "./variable.less";
+@import './variable.less';
 
 body,
 html {
@@ -9,7 +9,14 @@ html {
   color: @text;
 }
 
+#root {
+  overflow: hidden;
+}
+
 .f-container {
-  width: 694px;
-  margin: 0 auto;
+  max-width: 900px;
+  min-width: 600px;
+  margin: 25px auto;
+  padding: 30px 40px;
+  background-color: #fff;
 }
