@@ -20,6 +20,7 @@ interface IAuthorItem {
 
 export default function AuthorList(props: IAuthorListProps) {
   const { title, data, onCancelFollow, recommend } = props;
+
   return (
     <div className='follow'>
       <h1>{title}</h1>
@@ -28,11 +29,13 @@ export default function AuthorList(props: IAuthorListProps) {
         dataSource={data}
         renderItem={(author: IAuthorItem) => (
           <List.Item
+            key={author.id}
             actions={[
               <Button
+                key={author.id}
                 type='primary'
-                onClick={async (e) => {
-                  await onCancelFollow(author.id, !!author.unfollow);
+                onClick={() => {
+                  onCancelFollow(author.id, !!author.unfollow);
                 }}
               >
                 {author.unfollow
@@ -40,9 +43,9 @@ export default function AuthorList(props: IAuthorListProps) {
                     ? '取消关注'
                     : '关注'
                   : recommend
-                  ? '关注'
-                  : '取消关注'}
-              </Button>,
+                    ? '关注'
+                    : '取消关注'}
+              </Button>
             ]}
           >
             <List.Item.Meta

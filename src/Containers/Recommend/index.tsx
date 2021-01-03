@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { IRouterProps } from '../types';
-import { useFetchData } from '../../Fetch';
+import { useFetchData } from '../../fetcher';
 import AuthorList from '../../Components/auhtorList';
 
 interface IAuthorItem {
@@ -38,11 +38,12 @@ export default function Recommend(props: IRouterProps) {
   };
 
   return (
+
     <AuthorList
       onCancelFollow={onCancelFollow}
       title='推荐关注'
       data={data}
       recommend={true}
-    ></AuthorList>
+    />
   );
 }
