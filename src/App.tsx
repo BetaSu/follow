@@ -12,12 +12,14 @@ const Loading = () => {
 
 export default function App() {
   return (
-    <Suspense fallback={<Loading />}>
-      <Router>
-        <User path='/user' />
-        <Flow path='/' />
-        <Recommend path='/recommend' />
-      </Router>
-    </Suspense>
+    <div className="f-container">
+      <Suspense fallback={<Loading />}>
+        <Router>
+          <User path='/user' />
+          <Flow path='/' />
+          <Recommend path='/recommend' />
+        </Router>
+      </Suspense>
+    </div>
   );
 }
