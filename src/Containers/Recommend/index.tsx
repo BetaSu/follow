@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import axios from 'axios';
 import { IRouterProps } from '../types';
 import { fetcher } from '../../fetcher';
@@ -21,11 +21,20 @@ const getKey = (pageIndex: number, previousPageData: IAuthorItem[] | null) => {
 };
 
 export default function Recommend(props: IRouterProps) {
-  const { data, size, setSize, mutate } = useSWRInfinite(getKey, fetcher, {
-    revalidateOnFocus: false,
-  });
-  if (!data) return <div>'loading'</div>;
+  const { data, size, error, setSize, mutate } = useSWRInfinite(
+    getKey,
+    fetcher
+  );
+  const isLoadingRef = useRef<boolean>(false);
 
+  const isLoadingInitialData = !data && !error;
+  const isLoadingMore =
+    isLoadingInitialData ||
+    (size > 0 && data && typeof data[size - 1] === 'undefined');
+
+  isLoadingRef.current = !!isLoadingMore;
+
+  if (!data) return <div>'loading'</div>;
   const onCancelFollow = async (id: number, type: boolean) => {
     const newData = data.map((list: IAuthorItem[]) => {
       return list.map((d) => {
@@ -43,16 +52,27 @@ export default function Recommend(props: IRouterProps) {
     mutate(newData, false);
   };
 
+  const handleMore = (page: number) => {
+    if (isLoadingRef.current) {
+      return;
+    }
+    isLoadingRef.current = true;
+    console.log('set size', page);
+    setSize(page);
+  };
+
   const allList = data.reduce((pre, cur) => pre.concat(cur), []);
   return (
     <React.Fragment>
+      <h1>推荐关注</h1>
       <AuthorList
         onCancelFollow={onCancelFollow}
-        title='推荐关注'
         data={allList}
         recommend={true}
+        handleMore={handleMore}
+        hasMore={data[data.length - 1].length !== 0}
       />
-      <button onClick={() => setSize(size + 1)}>Load More</button>
+      {/* <button onClick={() => setSize(size + 1)}>Load More</button> */}
     </React.Fragment>
   );
 }

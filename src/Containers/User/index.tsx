@@ -35,11 +35,12 @@ export default function User(props: IRouterProps) {
   };
 
   return (
-
     <AuthorList
       onCancelFollow={onCancelFollow}
       title='我的关注'
       data={data}
+      handleMore={() => {}}
+      hasMore={true}
     />
   );
 }
