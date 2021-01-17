@@ -1,5 +1,6 @@
 export interface IRouterProps {
   path: string;
+  [param: string]: string;
 }
 
 export interface Response {
