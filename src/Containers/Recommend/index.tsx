@@ -1,9 +1,9 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import axios from 'axios';
 import { IRouterProps } from '../types';
 import { fetcher } from '../../fetcher';
 import { useSWRInfinite } from 'swr';
-import AuthorList from '../../Components/auhtorList';
+import AuthorList from '../../Components/AuthorList';
 
 interface IAuthorItem {
   id: number;
@@ -17,24 +17,29 @@ const getKey = (pageIndex: number, previousPageData: IAuthorItem[] | null) => {
   if (previousPageData && !previousPageData.length) {
     return null;
   }
-  return `/follow/recommend?page=${pageIndex}&limit=3`;
+  return `/follow/recommend?page=${pageIndex + 1}&pagesize=3`;
 };
 
+
 export default function Recommend(props: IRouterProps) {
-  const { data, size, error, setSize, mutate } = useSWRInfinite(
-    getKey,
-    fetcher
-  );
-  const isLoadingRef = useRef<boolean>(false);
+  const { data, size, error, isValidating, setSize, mutate } = useSWRInfinite(getKey, fetcher);
 
   const isLoadingInitialData = !data && !error;
+
   const isLoadingMore =
     isLoadingInitialData ||
-    (size > 0 && data && typeof data[size - 1] === 'undefined');
+    (size > 0 && data && data[size - 1] === undefined);
 
-  isLoadingRef.current = !!isLoadingMore;
+  const isEmpty = data?.[0]?.length === 0;
+
+  const isReachingEnd =
+    isEmpty || (data && data[data.length - 1]?.length === 0);
+
+  const isRefreshing = isValidating && data && data.length === size;
+
 
   if (!data) return <div>'loading'</div>;
+
   const onCancelFollow = async (id: number, type: boolean) => {
     const newData = data.map((list: IAuthorItem[]) => {
       return list.map((d) => {
@@ -52,27 +57,21 @@ export default function Recommend(props: IRouterProps) {
     mutate(newData, false);
   };
 
-  const handleMore = (page: number) => {
-    if (isLoadingRef.current) {
-      return;
-    }
-    isLoadingRef.current = true;
-    console.log('set size', page);
-    setSize(page);
-  };
 
-  const allList = data.reduce((pre, cur) => pre.concat(cur), []);
+  const list2Use = data.reduce((pre, cur) => pre.concat(cur), []);
+
+  const hasMore = !isLoadingMore && !isRefreshing && !isReachingEnd;
+
   return (
     <React.Fragment>
       <h1>推荐关注</h1>
       <AuthorList
         onCancelFollow={onCancelFollow}
-        data={allList}
+        data={list2Use}
         recommend={true}
-        handleMore={handleMore}
-        hasMore={data[data.length - 1].length !== 0}
+        handleMore={setSize}
+        hasMore={hasMore}
       />
-      {/* <button onClick={() => setSize(size + 1)}>Load More</button> */}
     </React.Fragment>
   );
 }

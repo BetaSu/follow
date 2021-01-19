@@ -25,10 +25,13 @@ export default function AuthorList(props: IAuthorListProps) {
   const { data, onCancelFollow, recommend, handleMore, hasMore } = props;
 
   return (
-    <div className='follow'>
+    <div className="follow-scroll-wrapper">
       <InfiniteScroll
+        className='follow'
+        // swr会完成初次请求
         initialLoad={false}
-        pageStart={0}
+        pageStart={1}
+        threshold={5}
         loadMore={handleMore}
         hasMore={hasMore}
         useWindow={false}
@@ -53,8 +56,8 @@ export default function AuthorList(props: IAuthorListProps) {
                       ? '取消关注'
                       : '关注'
                     : recommend
-                    ? '关注'
-                    : '取消关注'}
+                      ? '关注'
+                      : '取消关注'}
                 </Button>,
               ]}
             >

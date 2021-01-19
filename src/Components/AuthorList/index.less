@@ -1,17 +1,22 @@
-@import '../variable.less';
+@import "../../variable.less";
 
 .follow {
-  height: 200px;
-  overflow: auto;
   h1 {
     font-size: 16px;
     color: @text;
   }
+
   .ant-list-item-meta-title > a {
     color: @text;
     font-size: 15px;
   }
+
   .ant-list-item-meta-description {
     color: @info;
+  }
+
+  &-scroll-wrapper {
+    height: 200px;
+    overflow: auto;
   }
 }

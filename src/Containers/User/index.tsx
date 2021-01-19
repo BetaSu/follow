@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import { IRouterProps } from '../types';
 import { useFetchData } from '../../fetcher';
-import AuthorList from '../../Components/auhtorList';
+import AuthorList from '../../Components/AuthorList';
 
 interface IAuthorItem {
   id: number;
@@ -13,9 +13,7 @@ interface IAuthorItem {
 }
 
 export default function User(props: IRouterProps) {
-  const { data, isError, mutate } = useFetchData('/follow', undefined, {
-    revalidateOnFocus: false,
-  });
+  const { data, isError, mutate } = useFetchData('/follow');
   if (isError) return <div>isError</div>;
 
   const onCancelFollow = async (id: number, type: boolean) => {
@@ -39,7 +37,7 @@ export default function User(props: IRouterProps) {
       onCancelFollow={onCancelFollow}
       title='我的关注'
       data={data}
-      handleMore={() => {}}
+      handleMore={() => { }}
       hasMore={true}
     />
   );
