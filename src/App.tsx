@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { Router } from '@reach/router';
-import User from './Containers/User';
+import Follow from './Containers/Follow';
 import Flow from './Containers/Flow';
 import 'antd/dist/antd.css';
 import './App.less';
@@ -12,14 +12,12 @@ const Loading = () => {
 
 export default function App() {
   return (
-    <div className="f-container">
-      <Suspense fallback={<Loading />}>
-        <Router>
-          <User path='/user' />
-          <Flow path='/' />
-          <Recommend path='/recommend' />
-        </Router>
-      </Suspense>
-    </div>
+    <Suspense fallback={<Loading />}>
+      <Router className="router">
+        <Follow path='/follow' />
+        <Flow path='/' />
+        <Recommend path='/recommend' />
+      </Router>
+    </Suspense>
   );
 }

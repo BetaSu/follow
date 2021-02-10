@@ -1,8 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { IRouterProps } from '../types';
-import { fetcher } from '../../fetcher';
-import { useSWRInfinite } from 'swr';
+import { useFetchFlowData, requestPrefix } from '../../fetcher';
 import AuthorList from '../../Components/AuthorList';
 
 interface IAuthorItem {
@@ -17,25 +16,13 @@ const getKey = (pageIndex: number, previousPageData: IAuthorItem[] | null) => {
   if (previousPageData && !previousPageData.length) {
     return null;
   }
-  return `/follow/recommend?page=${pageIndex + 1}&pagesize=3`;
+  return `/follow/recommend?page=${pageIndex + 1}&pagesize=20`;
 };
 
+const swrOption = {}
 
 export default function Recommend(props: IRouterProps) {
-  const { data, size, error, isValidating, setSize, mutate } = useSWRInfinite(getKey, fetcher);
-
-  const isLoadingInitialData = !data && !error;
-
-  const isLoadingMore =
-    isLoadingInitialData ||
-    (size > 0 && data && data[size - 1] === undefined);
-
-  const isEmpty = data?.[0]?.length === 0;
-
-  const isReachingEnd =
-    isEmpty || (data && data[data.length - 1]?.length === 0);
-
-  const isRefreshing = isValidating && data && data.length === size;
+  const { data, setSize, mutate, hasMore } = useFetchFlowData(getKey, swrOption);
 
 
   if (!data) return <div>'loading'</div>;
@@ -49,7 +36,7 @@ export default function Recommend(props: IRouterProps) {
         return d;
       });
     });
-    await axios.post('http://localhost:3000/api/follow/follow', {
+    await axios.post(`${requestPrefix}/follow/follow`, {
       author_id: id,
       type: +!type,
     });
@@ -59,8 +46,6 @@ export default function Recommend(props: IRouterProps) {
 
 
   const list2Use = data.reduce((pre, cur) => pre.concat(cur), []);
-
-  const hasMore = !isLoadingMore && !isRefreshing && !isReachingEnd;
 
   return (
     <React.Fragment>
