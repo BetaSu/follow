@@ -1,10 +1,10 @@
 import React from 'react';
-import axios from 'axios';
-import { IRouterProps } from '../types';
-import { useFetchFlowData, requestPrefix } from '../../fetcher';
+import { IRouterProps, MutatieFollow } from '../types';
+import { useInfiniteQuery, useMutation, InfiniteData } from 'react-query';
+import { axiosInstance, queryClient } from '../../fetcher';
 import AuthorList from '../../Components/AuthorList';
 
-interface IAuthorItem {
+interface AuthorItem {
   id: number;
   name: string;
   avatar: string;
@@ -12,49 +12,82 @@ interface IAuthorItem {
   unfollow?: boolean;
 }
 
-const getKey = (pageIndex: number, previousPageData: IAuthorItem[] | null) => {
-  if (previousPageData && !previousPageData.length) {
-    return null;
-  }
-  return `/follow/recommend?page=${pageIndex + 1}&pagesize=20`;
+const PAGE_SIZE = 20;
+const QUERY_KEY = 'recommendList';
+
+const fetchRmdList = (queryKey: any) => {
+  console.log('queryKeyqueryKey', queryKey);
+  const url = `/follow/recommend`;
+  return axiosInstance.get(url, {
+    params: {
+      page: 1,
+      pagesize: PAGE_SIZE
+    }
+  }).then(res => res.data.data);
 };
 
-const swrOption = {}
-
 export default function Recommend(props: IRouterProps) {
-  const { data, setSize, mutate, hasMore } = useFetchFlowData(getKey, swrOption);
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage
+  } = useInfiniteQuery<AuthorItem[], unknown, AuthorItem>(QUERY_KEY, fetchRmdList, {
+    getNextPageParam: (lastPage, pages) => {
+      // 返回undefined后hasNextPage为false
+      if (lastPage.length < PAGE_SIZE) {
+        return;
+      }
+      const len = pages.length;
+      return len + 1;
+    },
+  });
 
-
-  if (!data) return <div>'loading'</div>;
+  const { mutateAsync } = useMutation<AuthorItem, unknown, MutatieFollow>(
+    params => axiosInstance.post('/follow/follow', params).then(res => res.data)
+  );
 
   const onCancelFollow = async (id: number, type: boolean) => {
-    const newData = data.map((list: IAuthorItem[]) => {
-      return list.map((d) => {
-        if (d.id === id) {
-          return { ...d, unfollow: !type };
-        }
-        return d;
-      });
-    });
-    await axios.post(`${requestPrefix}/follow/follow`, {
+    const newType = !type;
+    await mutateAsync({
       author_id: id,
-      type: +!type,
+      type: newType
     });
 
-    mutate(newData, false);
+    queryClient.setQueryData<InfiniteData<AuthorItem[]> | undefined>(QUERY_KEY, old => {
+      if (!old) {
+        return;
+      }
+      const { pages } = old;
+      return pages.map(d => {
+        d.forEach(item => {
+          if (item.id === id) {
+            item.unfollow = newType;
+          }
+        })
+      })
+    })
+
   };
 
-
-  const list2Use = data.reduce((pre, cur) => pre.concat(cur), []);
+  // @ts-ignore 无语
+  const { pages } = data;
+  const hasMore = !isFetching && !isFetchingNextPage && !hasNextPage;
+  const data2Use = (pages as AuthorItem[]).reduce<AuthorItem[]>((pre, cur) => pre.concat(cur), []);
 
   return (
     <React.Fragment>
       <h1>推荐关注</h1>
       <AuthorList
         onCancelFollow={onCancelFollow}
-        data={list2Use}
+        data={data2Use}
+        initialLoad={true}
         recommend={true}
-        handleMore={setSize}
+        handleMore={() => {
+          fetchNextPage()
+        }}
         hasMore={hasMore}
       />
     </React.Fragment>

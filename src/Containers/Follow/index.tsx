@@ -1,7 +1,9 @@
 import React from 'react';
 import axios from 'axios';
-import { IRouterProps } from '../types';
-import { useFetchData } from '../../fetcher';
+import { useQuery, useMutation } from 'react-query';
+
+import { IRouterProps, MutatieFollow } from '../types';
+import { axiosInstance } from '../../fetcher';
 import AuthorList from '../../Components/AuthorList';
 
 interface IAuthorItem {
@@ -12,24 +14,17 @@ interface IAuthorItem {
   unfollow?: boolean;
 }
 
+
+
 export default function User(props: IRouterProps) {
-  const { data, isError, mutate } = useFetchData('/follow');
-  if (isError) return <div>isError</div>;
+  const { data } = useQuery('follow', () => axiosInstance.get('/follow').then(res => res.data.data));
+  const { mutate } = useMutation<unknown, unknown, MutatieFollow>(params => axiosInstance.post('/follow/follow', params))
 
   const onCancelFollow = async (id: number, type: boolean) => {
-    const newData = data.map((d: IAuthorItem) => {
-      if (d.id === id) {
-        return { ...d, unfollow: !type };
-      }
-      return d;
-    });
-
-    await axios.post('http://localhost:3000/api/follow/follow', {
+    mutate({
       author_id: id,
-      type: +type,
+      type,
     });
-
-    mutate(newData, false);
   };
 
   return (

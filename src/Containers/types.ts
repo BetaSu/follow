@@ -12,3 +12,8 @@ export interface Response {
 export interface PlainObject {
   [propsName: string]: any;
 }
+
+export interface MutatieFollow {
+  author_id: number;
+  type: boolean;
+}

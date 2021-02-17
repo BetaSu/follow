@@ -11,6 +11,7 @@ interface IAuthorListProps {
   recommend?: boolean;
   handleMore: (size: number) => void;
   hasMore: boolean;
+  initialLoad?: boolean;
 }
 
 interface IAuthorItem {
@@ -22,13 +23,12 @@ interface IAuthorItem {
 }
 
 export default function AuthorList(props: IAuthorListProps) {
-  const { data, onCancelFollow, recommend, handleMore, hasMore } = props;
+  const { data, onCancelFollow, recommend, handleMore, hasMore, initialLoad } = props;
 
   return (
     <InfiniteScroll
       className='follow'
-      // swr会完成初次请求
-      initialLoad={false}
+      initialLoad={!!initialLoad}
       pageStart={1}
       threshold={5}
       loadMore={handleMore}
