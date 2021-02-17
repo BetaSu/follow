@@ -18,7 +18,8 @@
     "eofline": false,
     "no-console": false,
     "quotemark": false,
-    "jsx-no-lambda": false
+    "jsx-no-lambda": false,
+    "no-shadowed-variable": false
   },
   "rulesDirectory": []
 }
