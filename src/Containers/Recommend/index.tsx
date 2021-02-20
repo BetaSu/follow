@@ -56,10 +56,12 @@ export default function Recommend(props: IRouterProps) {
       type: newType
     });
 
-    queryClient.setQueryData<InfiniteData<AuthorItem[]> | undefined>(QUERY_KEY, old => {
+    // @ts-ignore 小贝帮忙看看 让人困惑
+    queryClient.setQueryData<InfiniteData<AuthorItem[]>>(QUERY_KEY, old => {
       if (!old) {
         return;
       }
+      console.log('old~', old);
       const { pages } = old;
       return pages.map(d => {
         d.forEach(item => {
@@ -72,7 +74,8 @@ export default function Recommend(props: IRouterProps) {
 
   };
 
-  // @ts-ignore 无语
+
+  // @ts-ignore 小贝帮忙看看 让人困惑
   const { pages } = data;
   const hasMore = !isFetching && !isFetchingNextPage && !hasNextPage;
   const data2Use = (pages as AuthorItem[]).reduce<AuthorItem[]>((pre, cur) => pre.concat(cur), []);
